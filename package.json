@@ -4,10 +4,15 @@
   "version": "0.1.0",
   "workspaces": ["apps/api", "apps/web"],
   "scripts": {
-    "build": "npm run build --workspace @astrobsm/web",
+    "build": "npm run build:api && npm run build:web",
+    "build:api": "esbuild apps/api/src/index.ts --bundle --platform=node --target=node20 --format=cjs --external:@prisma/client --external:.prisma/client --outfile=apps/api/dist/server.cjs",
+    "build:web": "npm run build --workspace @astrobsm/web",
     "dev:api": "npm run dev --workspace @astrobsm/api",
     "dev:web": "npm run dev --workspace @astrobsm/web",
     "seed": "npm run seed --workspace @astrobsm/api",
     "postinstall": "npm run prisma:generate --workspace @astrobsm/api"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
   }
 }

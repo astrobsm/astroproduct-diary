@@ -1,10 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build --workspace @astrobsm/web",
+  "buildCommand": "npm run build",
   "outputDirectory": "apps/web/dist",
   "functions": {
     "api/index.ts": {
-      "includeFiles": "apps/api/node_modules/.prisma/client/**"
+      "includeFiles": "apps/api/{dist/server.cjs,node_modules/.prisma/**,node_modules/@prisma/**}"
     }
   },
   "rewrites": [

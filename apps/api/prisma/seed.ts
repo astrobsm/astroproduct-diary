@@ -8,6 +8,7 @@
  */
 import { PrismaClient } from "@prisma/client";
 import { seedProducts, seedReferences } from "../src/data/seed";
+import { geoZones, geoStates } from "../src/data/geography";
 import { hashPassword } from "../src/auth/security";
 
 const prisma = new PrismaClient();
@@ -80,6 +81,35 @@ async function main() {
     });
   }
 
+  // Reference geography: Nigeria, its six geopolitical zones and 36 states + FCT.
+  // Public, verifiable groupings only — NO facility/contact records (those are
+  // added solely through the provenance-enforced import pipeline).
+  const country = await prisma.country.upsert({
+    where: { iso2: "NG" },
+    update: { name: "Nigeria" },
+    create: { iso2: "NG", name: "Nigeria", language: "en" }
+  });
+  for (const zone of geoZones) {
+    await prisma.geopoliticalZone.upsert({
+      where: { id: zone.id },
+      update: { name: zone.name, countryId: country.id },
+      create: { id: zone.id, name: zone.name, countryId: country.id }
+    });
+  }
+  for (const state of geoStates) {
+    await prisma.stateRegion.upsert({
+      where: { id: state.id },
+      update: { name: state.name, code: state.capital, zoneId: state.zoneId, countryId: country.id },
+      create: {
+        id: state.id,
+        name: state.name,
+        code: state.capital,
+        zoneId: state.zoneId,
+        countryId: country.id
+      }
+    });
+  }
+
   // Research references (explicit ids so products can link to them)
   for (const ref of seedReferences) {
     let sourceId: string | undefined;
@@ -144,6 +174,7 @@ async function main() {
 
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
+      `${geoZones.length} zones, ${geoStates.length} states, ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
 }
