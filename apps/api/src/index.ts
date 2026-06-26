@@ -70,7 +70,13 @@ app.use("/api/v1", v1);
 // Final error handler — must be last.
 app.use(errorMiddleware);
 
-app.listen(config.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`ASTROBSM API listening on http://localhost:${config.port}`);
-});
+// On Vercel the app is exported and invoked per-request as a serverless
+// function (see ../api/index.ts); locally we bind a port and listen.
+if (!process.env.VERCEL) {
+  app.listen(config.port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`ASTROBSM API listening on http://localhost:${config.port}`);
+  });
+}
+
+export default app;

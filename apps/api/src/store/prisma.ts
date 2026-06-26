@@ -38,7 +38,11 @@ import type {
   TrainerFilter
 } from "./repository";
 
-const prisma = new PrismaClient();
+// Reuse a single PrismaClient across serverless invocations (Vercel cold
+// starts) to avoid exhausting the database connection pool.
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 const COURSE_INCLUDE = {
   modules: { include: { lessons: true } },
