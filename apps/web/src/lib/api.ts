@@ -193,6 +193,7 @@ export interface ApiFacility {
   website?: string;
   source: string;
   verifiedAt?: string;
+  verificationStatus?: "VERIFIED" | "UNVERIFIED";
   createdAt: string;
 }
 

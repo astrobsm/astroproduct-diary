@@ -229,6 +229,8 @@ export interface Facility {
   /** Provenance: where this record was sourced from (URL / register name). */
   source: string;
   verifiedAt?: string;
+  /** Derived on read: GREEN when confirmed against an authoritative register, AMBER otherwise. */
+  verificationStatus?: "VERIFIED" | "UNVERIFIED";
   createdAt: string;
 }
 

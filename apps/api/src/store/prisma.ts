@@ -319,6 +319,7 @@ function toFacility(f: {
     website: f.website ?? undefined,
     source: f.source ?? "",
     verifiedAt: f.verifiedAt?.toISOString(),
+    verificationStatus: f.verifiedAt ? "VERIFIED" : "UNVERIFIED",
     createdAt: f.createdAt.toISOString()
   };
 }

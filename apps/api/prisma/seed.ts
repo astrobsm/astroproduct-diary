@@ -12,6 +12,7 @@ import { geoZones, geoStates } from "../src/data/geography";
 import {
   seedFacilities,
   FACILITY_SOURCE,
+  FACILITY_SOURCE_UNVERIFIED,
   FACILITY_VERIFIED_AT
 } from "../src/data/facilities";
 import { hashPassword } from "../src/auth/security";
@@ -194,6 +195,7 @@ async function main() {
     });
     if (existing) continue;
     const stateName = stateNameById.get(f.stateId) ?? "";
+    const isVerified = f.verified !== false;
     await prisma.facility.create({
       data: {
         countryId: country.id,
@@ -201,9 +203,11 @@ async function main() {
         stateId: f.stateId,
         name: f.name,
         type: f.type,
-        address: f.city ? `${f.city}, ${stateName}` : stateName,
-        source: FACILITY_SOURCE,
-        verifiedAt: new Date(FACILITY_VERIFIED_AT)
+        address: f.address ?? (f.city ? `${f.city}, ${stateName}` : stateName),
+        phone: f.phone ?? null,
+        source: f.source ?? (isVerified ? FACILITY_SOURCE : FACILITY_SOURCE_UNVERIFIED),
+        // verifiedAt drives the GREEN (verified) vs AMBER (unverified) badge.
+        verifiedAt: isVerified ? new Date(FACILITY_VERIFIED_AT) : null
       }
     });
     facilitiesAdded += 1;

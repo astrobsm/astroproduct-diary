@@ -392,6 +392,7 @@ export class MemoryRepository implements Repository {
     const facility: Facility = {
       ...data,
       id: `fac-${randomUUID()}`,
+      verificationStatus: data.verifiedAt ? "VERIFIED" : "UNVERIFIED",
       createdAt: new Date().toISOString()
     };
     this.facilities.push(facility);

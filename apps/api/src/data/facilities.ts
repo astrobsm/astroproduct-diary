@@ -23,17 +23,36 @@ import { geoStates } from "./geography";
 export type SeedFacilityType =
   | "TEACHING_HOSPITAL"
   | "FEDERAL_MEDICAL_CENTRE"
-  | "SPECIALIST_HOSPITAL";
+  | "SPECIALIST_HOSPITAL"
+  | "GENERAL_HOSPITAL";
 
 export interface SeedFacility {
   name: string;
   type: SeedFacilityType;
   stateId: string;
   city?: string;
+  /**
+   * Verification state. `true` (default) marks the government-established
+   * institutional tier whose existence/type/host-state is on the Federal
+   * Ministry of Health register → rendered GREEN. `false` marks records that
+   * are community-listed (Wikipedia) but not independently confirmed against an
+   * authoritative register → rendered AMBER until verified.
+   */
+  verified?: boolean;
+  /** Street/area address — only ever set from a real, sourced value. */
+  address?: string;
+  /** Contact phone — only ever set from a real, sourced value. Never fabricated. */
+  phone?: string;
+  /** Per-record provenance override (defaults to the verified/unverified source). */
+  source?: string;
 }
 
 export const FACILITY_SOURCE =
   "Federal Ministry of Health, Nigeria (health.gov.ng); Wikipedia — List of teaching hospitals in Nigeria (verified institutional tier)";
+
+/** Provenance for community-listed (amber) records pending authoritative confirmation. */
+export const FACILITY_SOURCE_UNVERIFIED =
+  "Wikipedia — List of hospitals in Nigeria (community-listed; not independently verified)";
 
 /** Verified date for this curated dataset (ISO-8601). */
 export const FACILITY_VERIFIED_AT = "2026-06-26T00:00:00.000Z";
@@ -41,6 +60,7 @@ export const FACILITY_VERIFIED_AT = "2026-06-26T00:00:00.000Z";
 const TH = "TEACHING_HOSPITAL" as const;
 const FMC = "FEDERAL_MEDICAL_CENTRE" as const;
 const SH = "SPECIALIST_HOSPITAL" as const;
+const GH = "GENERAL_HOSPITAL" as const;
 
 export const seedFacilities: SeedFacility[] = [
   // ---- South East ----
@@ -132,7 +152,41 @@ export const seedFacilities: SeedFacility[] = [
   { name: "University of Medical Sciences Teaching Hospital, Ondo", type: TH, stateId: "state-ondo", city: "Ondo" },
   { name: "Obafemi Awolowo University Teaching Hospital Complex, Ile-Ife", type: TH, stateId: "state-osun", city: "Ile-Ife" },
   { name: "Ladoke Akintola University of Technology Teaching Hospital, Osogbo", type: TH, stateId: "state-osun", city: "Osogbo" },
-  { name: "University College Hospital, Ibadan", type: TH, stateId: "state-oyo", city: "Ibadan" }
+  { name: "University College Hospital, Ibadan", type: TH, stateId: "state-oyo", city: "Ibadan" },
+
+  // ===================================================================
+  // Community-listed (AMBER / unverified). Existence is referenced on the
+  // public Wikipedia "List of hospitals in Nigeria" but not independently
+  // confirmed against an authoritative register. Contact details are omitted
+  // (never fabricated) and these stay amber until verified via the import
+  // pipeline against an official source.
+  // ===================================================================
+
+  // ---- South West ----
+  { name: "Afe Babalola University Multi-System Teaching Hospital, Ado-Ekiti", type: TH, stateId: "state-ekiti", city: "Ado-Ekiti", verified: false },
+  { name: "Bowen University Teaching Hospital, Ogbomoso", type: TH, stateId: "state-oyo", city: "Ogbomoso", verified: false },
+  { name: "Babcock University Teaching Hospital, Ilishan-Remo", type: TH, stateId: "state-ogun", city: "Ilishan-Remo", verified: false },
+  { name: "Massey Street Children's Hospital, Lagos Island", type: SH, stateId: "state-lagos", city: "Lagos", verified: false },
+  { name: "Etta Atlantic Memorial Hospital, Lagos", type: GH, stateId: "state-lagos", city: "Lagos", verified: false },
+
+  // ---- South South ----
+  { name: "Igbinedion University Teaching Hospital, Okada", type: TH, stateId: "state-edo", city: "Okada", verified: false },
+  { name: "Madonna University Teaching Hospital, Elele", type: TH, stateId: "state-rivers", city: "Elele", verified: false },
+
+  // ---- South East ----
+  { name: "Regions Stroke and Neuroscience Hospital, Mgbirichi", type: SH, stateId: "state-imo", city: "Mgbirichi", verified: false },
+
+  // ---- North Central ----
+  { name: "African Medical Centre of Excellence, Abuja", type: SH, stateId: "state-fct", city: "Abuja", verified: false },
+  { name: "ECWA Hospital, Egbe", type: GH, stateId: "state-kogi", city: "Egbe", verified: false },
+  { name: "Ahmadiyya Hospital, New Bussa", type: GH, stateId: "state-niger", city: "New Bussa", verified: false },
+
+  // ---- North East ----
+  { name: "Borno State Specialist Hospital, Maiduguri", type: SH, stateId: "state-borno", city: "Maiduguri", verified: false },
+  { name: "Biu General Hospital", type: GH, stateId: "state-borno", city: "Biu", verified: false },
+  { name: "Newlife Hospital, Mubi", type: GH, stateId: "state-adamawa", city: "Mubi", verified: false },
+  { name: "General Hospital, Potiskum", type: GH, stateId: "state-yobe", city: "Potiskum", verified: false },
+  { name: "General Hospital, Ningi", type: GH, stateId: "state-bauchi", city: "Ningi", verified: false }
 ];
 
 /** Map of stateId -> GeoState for resolving zoneId during seeding. */

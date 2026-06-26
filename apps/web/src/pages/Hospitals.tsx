@@ -8,6 +8,7 @@ import {
   MapPin,
   Phone,
   ShieldCheck,
+  AlertTriangle,
   Upload
 } from "lucide-react";
 import SourceBadge from "../components/SourceBadge";
@@ -97,6 +98,14 @@ export default function Hospitals() {
                 Health facilities across the six geopolitical zones. Records are added only from
                 verifiable sources — no contact details are fabricated.
               </p>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Verified — confirmed against an official register
+                </span>
+                <span className="inline-flex items-center gap-1 font-medium text-amber-700">
+                  <AlertTriangle className="h-3.5 w-3.5" /> Unverified — community-listed, pending confirmation
+                </span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -176,9 +185,20 @@ export default function Hospitals() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {facilities.map((f) => (
             <div key={f.id} className="flex flex-col rounded-xl border bg-white p-5">
-              <span className="text-xs font-medium uppercase tracking-wide text-brand-blue">
-                {facilityTypeLabel[f.type] ?? f.type}
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-medium uppercase tracking-wide text-brand-blue">
+                  {facilityTypeLabel[f.type] ?? f.type}
+                </span>
+                {f.verificationStatus === "UNVERIFIED" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                    <AlertTriangle className="h-3 w-3" /> Unverified
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                    <ShieldCheck className="h-3 w-3" /> Verified
+                  </span>
+                )}
+              </div>
               <h2 className="mt-1 font-semibold text-slate-800">{f.name}</h2>
               <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
                 <MapPin className="h-3.5 w-3.5" />
@@ -211,7 +231,11 @@ export default function Hospitals() {
                 )}
               </div>
               <div className="mt-3 flex items-center gap-1 border-t pt-3 text-xs text-slate-400">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                {f.verificationStatus === "UNVERIFIED" ? (
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                ) : (
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+                )}
                 <span className="truncate" title={f.source}>
                   Source: {f.source}
                 </span>
