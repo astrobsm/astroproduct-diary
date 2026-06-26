@@ -3,6 +3,10 @@ node_modules/
 .pnp/
 .pnp.js
 
+# Lockfile omitted so Vercel resolves platform-correct optional deps
+# (npm optional-deps bug: https://github.com/npm/cli/issues/4828)
+package-lock.json
+
 # Build output
 dist/
 build/
