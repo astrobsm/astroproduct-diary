@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 164" role="img" aria-label="ASTROBSM">
+  <!-- Book body -->
+  <rect x="14" y="8" width="122" height="132" rx="14" fill="#2e2fa0"/>
+  <!-- Spine highlight -->
+  <rect x="26" y="16" width="4" height="116" rx="2" fill="#ffffff" opacity="0.5"/>
+  <!-- Inside text -->
+  <text x="78" y="56" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="24" letter-spacing="3">ASTRO</text>
+  <text x="78" y="98" text-anchor="middle" fill="#ffffff" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" letter-spacing="2">BSM</text>
+  <text x="78" y="118" text-anchor="middle" fill="#ffffff" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="11">BonneSante Medicals</text>
+  <!-- Open-book base / pages -->
+  <rect x="14" y="134" width="122" height="14" rx="7" fill="#2e2fa0"/>
+  <rect x="22" y="139" width="106" height="3" rx="1.5" fill="#ffffff" opacity="0.6"/>
+  <!-- Bookmark ribbon -->
+  <path d="M62 140 v22 l13 -10 l13 10 v-22 z" fill="#2e2fa0"/>
+</svg>
