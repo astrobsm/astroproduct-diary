@@ -13,6 +13,7 @@ import { hashPassword } from "../src/auth/security";
 const prisma = new PrismaClient();
 
 const ROLE_KEYS = [
+  "ADMIN",
   "PRODUCT_MANAGER",
   "MEDICAL_DIRECTOR",
   "SALES_REP",
@@ -51,6 +52,31 @@ async function main() {
       where: { userId_roleId: { userId: user.id, roleId } },
       update: {},
       create: { userId: user.id, roleId }
+    });
+  }
+
+  // Platform administrator (phone-based login). Override via env in production.
+  const adminEmail = process.env.SEED_SUPERADMIN_EMAIL ?? "admin@astrobsm.local";
+  const adminPhone = process.env.SEED_SUPERADMIN_PHONE ?? "08033328385";
+  const adminPassword = process.env.SEED_SUPERADMIN_PASSWORD ?? "blackvelvet";
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: { phone: adminPhone, status: "ACTIVE" },
+    create: {
+      email: adminEmail,
+      phone: adminPhone,
+      passwordHash: hashPassword(adminPassword),
+      fullName: "Platform Administrator",
+      locale: "en",
+      status: "ACTIVE"
+    }
+  });
+  for (const key of ["ADMIN", "PRODUCT_MANAGER", "MEDICAL_DIRECTOR", "TRAINER"] as const) {
+    const roleId = roleIds.get(key)!;
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: admin.id, roleId } },
+      update: {},
+      create: { userId: admin.id, roleId }
     });
   }
 

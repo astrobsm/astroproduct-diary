@@ -526,44 +526,102 @@ export class PrismaRepository implements Repository {
     return u ? this.toUser(u) : undefined;
   }
   async findUserByIdentifier(identifier: string): Promise<User | undefined> {
-    // Postgres backend currently keys on email; phone-based identifiers and the
-    // self-registration approval queue are served by the in-memory backend.
-    // When the Prisma schema gains `phone`/`status` columns, broaden this query.
-    return this.findUserByEmail(identifier);
-  }
-  async createPendingUser(): Promise<User> {
-    throw new Error(
-      "Self-registration is not yet supported on the PostgreSQL backend. Add phone/status columns to the Prisma schema first."
-    );
-  }
-  async listUsers(): Promise<User[]> {
-    const rows = await prisma.user.findMany({
+    const value = identifier.trim();
+    const u = await prisma.user.findFirst({
+      where: { OR: [{ email: value }, { phone: value }] },
       include: { roles: { include: { role: true } } }
+    });
+    return u ? this.toUser(u) : undefined;
+  }
+  async createPendingUser(
+    data: Omit<User, "id" | "status" | "roles"> & { requestedRoles: string[] }
+  ): Promise<User> {
+    const u = await prisma.user.create({
+      data: {
+        email: data.email,
+        phone: data.phone,
+        passwordHash: data.passwordHash,
+        fullName: data.fullName,
+        locale: data.locale,
+        status: "PENDING",
+        requestedRoles: data.requestedRoles
+      },
+      include: { roles: { include: { role: true } } }
+    });
+    return this.toUser(u);
+  }
+  async listUsers(status?: User["status"]): Promise<User[]> {
+    const rows = await prisma.user.findMany({
+      where: status ? { status } : undefined,
+      include: { roles: { include: { role: true } } },
+      orderBy: { createdAt: "desc" }
     });
     return rows.map((u) => this.toUser(u));
   }
-  async approveUser(): Promise<User | undefined> {
-    return undefined;
+  async approveUser(
+    id: string,
+    approvedById: string,
+    roles?: string[]
+  ): Promise<User | undefined> {
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) return undefined;
+    const grant = roles && roles.length > 0 ? roles : existing.requestedRoles;
+    for (const key of grant) {
+      const role = await prisma.role.upsert({
+        where: { key },
+        update: {},
+        create: { key, name: key.replace(/_/g, " ") }
+      });
+      await prisma.userRole.upsert({
+        where: { userId_roleId: { userId: id, roleId: role.id } },
+        update: {},
+        create: { userId: id, roleId: role.id }
+      });
+    }
+    const u = await prisma.user.update({
+      where: { id },
+      data: { status: "ACTIVE", approvedAt: new Date(), approvedById },
+      include: { roles: { include: { role: true } } }
+    });
+    return this.toUser(u);
   }
-  async rejectUser(): Promise<User | undefined> {
-    return undefined;
+  async rejectUser(id: string, approvedById: string): Promise<User | undefined> {
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) return undefined;
+    const u = await prisma.user.update({
+      where: { id },
+      data: { status: "REJECTED", approvedAt: new Date(), approvedById },
+      include: { roles: { include: { role: true } } }
+    });
+    return this.toUser(u);
   }
   private toUser(u: {
     id: string;
     email: string;
     passwordHash: string;
     fullName: string;
+    phone: string | null;
     locale: string;
+    status: string;
+    requestedRoles: string[];
+    approvedAt: Date | null;
+    approvedById: string | null;
+    createdAt?: Date;
     roles: { role: { key: string } }[];
   }): User {
     return {
       id: u.id,
       email: u.email,
+      phone: u.phone ?? undefined,
       passwordHash: u.passwordHash,
       fullName: u.fullName,
       roles: u.roles.map((r) => r.role.key),
       locale: u.locale as Locale,
-      status: "ACTIVE"
+      status: u.status as User["status"],
+      requestedRoles: u.requestedRoles,
+      approvedAt: u.approvedAt ? u.approvedAt.toISOString() : undefined,
+      approvedById: u.approvedById ?? undefined,
+      createdAt: u.createdAt ? u.createdAt.toISOString() : undefined
     };
   }
 

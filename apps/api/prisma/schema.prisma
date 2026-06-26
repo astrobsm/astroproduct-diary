@@ -20,9 +20,12 @@ model User {
   email        String         @unique
   passwordHash String
   fullName     String
-  phone        String?
+  phone        String?        @unique
   locale       String         @default("en")
   status       String         @default("ACTIVE")
+  requestedRoles String[]     @default([])
+  approvedAt   DateTime?
+  approvedById String?
   roles        UserRole[]
   enrollments  Enrollment[]
   attempts     QuizAttempt[]
