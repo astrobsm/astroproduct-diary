@@ -1,0 +1,13 @@
+{
+  "name": "astrobsm",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/api", "apps/web"],
+  "scripts": {
+    "build": "npm run build --workspace @astrobsm/web",
+    "dev:api": "npm run dev --workspace @astrobsm/api",
+    "dev:web": "npm run dev --workspace @astrobsm/web",
+    "seed": "npm run seed --workspace @astrobsm/api",
+    "postinstall": "npm run prisma:generate --workspace @astrobsm/api"
+  }
+}
