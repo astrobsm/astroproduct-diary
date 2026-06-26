@@ -9,6 +9,11 @@
 import { PrismaClient } from "@prisma/client";
 import { seedProducts, seedReferences } from "../src/data/seed";
 import { geoZones, geoStates } from "../src/data/geography";
+import {
+  seedFacilities,
+  FACILITY_SOURCE,
+  FACILITY_VERIFIED_AT
+} from "../src/data/facilities";
 import { hashPassword } from "../src/auth/security";
 
 const prisma = new PrismaClient();
@@ -172,9 +177,42 @@ async function main() {
     });
   }
 
+  // Verified tertiary-tier facilities (teaching hospitals, Federal Medical
+  // Centres, federal specialist hospitals). Idempotent on (name, stateId).
+  // Provenance is recorded; contact details are intentionally left blank.
+  const stateById = new Map(geoStates.map((s) => [s.id, s]));
+  const stateNameById = new Map(geoStates.map((s) => [s.id, s.name]));
+  let facilitiesAdded = 0;
+  for (const f of seedFacilities) {
+    const state = stateById.get(f.stateId);
+    if (!state) {
+      console.warn(`Skipping "${f.name}": unknown stateId "${f.stateId}"`);
+      continue;
+    }
+    const existing = await prisma.facility.findFirst({
+      where: { name: f.name, stateId: f.stateId }
+    });
+    if (existing) continue;
+    const stateName = stateNameById.get(f.stateId) ?? "";
+    await prisma.facility.create({
+      data: {
+        countryId: country.id,
+        zoneId: state.zoneId,
+        stateId: f.stateId,
+        name: f.name,
+        type: f.type,
+        address: f.city ? `${f.city}, ${stateName}` : stateName,
+        source: FACILITY_SOURCE,
+        verifiedAt: new Date(FACILITY_VERIFIED_AT)
+      }
+    });
+    facilitiesAdded += 1;
+  }
+
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
       `${geoZones.length} zones, ${geoStates.length} states, ` +
+      `${seedFacilities.length} facilities (${facilitiesAdded} new), ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
 }
