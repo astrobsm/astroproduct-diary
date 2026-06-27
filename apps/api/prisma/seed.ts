@@ -17,6 +17,7 @@ import {
 } from "../src/data/facilities";
 import { seedPharmacies, PHARMACY_SOURCE } from "../src/data/pharmacies";
 import { seedDoctors, DOCTOR_SOURCE, DOCTOR_VERIFIED_AT } from "../src/data/doctors";
+import { seedCourses } from "../src/data/courses";
 import { hashPassword } from "../src/auth/security";
 
 const prisma = new PrismaClient();
@@ -277,12 +278,73 @@ async function main() {
     doctorsAdded += 1;
   }
 
+  // --- LMS courses (modules, lessons, quiz) ---
+  // Idempotent on slug. Mirrors the nested write used by store.createCourse so
+  // production PostgreSQL carries the same Academy catalog as the dev store.
+  let coursesAdded = 0;
+  for (const c of seedCourses) {
+    const existing = await prisma.course.findUnique({ where: { slug: c.slug } });
+    if (existing) continue;
+    await prisma.course.create({
+      data: {
+        slug: c.slug,
+        title: c.title,
+        description: c.description,
+        audience: c.audience,
+        level: c.level,
+        coverImage: c.coverImage ?? null,
+        published: c.published,
+        i18n: { accent: c.accent, durationMins: c.durationMins },
+        modules: {
+          create: c.modules.map((m, mIdx) => ({
+            title: m.title,
+            order: mIdx,
+            i18n: { summary: m.summary },
+            lessons: {
+              create: m.lessons.map((l, lIdx) => ({
+                title: l.title,
+                contentType: l.contentType,
+                body: l.body ?? null,
+                mediaUrl: l.mediaUrl ?? null,
+                order: lIdx,
+                i18n: { durationMins: l.durationMins }
+              }))
+            }
+          }))
+        },
+        ...(c.quiz
+          ? {
+              quizzes: {
+                create: [
+                  {
+                    title: c.quiz.title,
+                    passScore: c.quiz.passScore,
+                    questions: {
+                      create: c.quiz.questions.map((q) => ({
+                        prompt: q.prompt,
+                        type: q.type,
+                        options: q.options,
+                        correct: q.correct,
+                        explanation: q.explanation ?? null
+                      }))
+                    }
+                  }
+                ]
+              }
+            }
+          : {})
+      }
+    });
+    coursesAdded += 1;
+  }
+
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
       `${geoZones.length} zones, ${geoStates.length} states, ` +
       `${allFacilities.length} facilities (${facilitiesAdded} new, ${facilitiesUpdated} updated, ` +
       `${seedPharmacies.length} pharmacies), ` +
       `${seedDoctors.length} doctors (${doctorsAdded} new), ` +
+      `${seedCourses.length} courses (${coursesAdded} new), ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
 }
