@@ -190,6 +190,7 @@ async function main() {
     ...seedPharmacies.map((p) => ({ ...p, source: p.source ?? PHARMACY_SOURCE }))
   ];
   let facilitiesAdded = 0;
+  let facilitiesUpdated = 0;
   for (const f of allFacilities) {
     const state = stateById.get(f.stateId);
     if (!state) {
@@ -199,9 +200,24 @@ async function main() {
     const existing = await prisma.facility.findFirst({
       where: { name: f.name, stateId: f.stateId }
     });
-    if (existing) continue;
     const stateName = stateNameById.get(f.stateId) ?? "";
     const isVerified = f.verified !== false;
+    if (existing) {
+      // Backfill contact details onto already-seeded rows (e.g. phone numbers
+      // sourced from official hospital websites after the initial import).
+      if (f.phone && !existing.phone) {
+        await prisma.facility.update({
+          where: { id: existing.id },
+          data: {
+            phone: f.phone,
+            ...(f.address ? { address: f.address } : {}),
+            ...(f.source ? { source: f.source } : {})
+          }
+        });
+        facilitiesUpdated += 1;
+      }
+      continue;
+    }
     await prisma.facility.create({
       data: {
         countryId: country.id,
@@ -222,7 +238,7 @@ async function main() {
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
       `${geoZones.length} zones, ${geoStates.length} states, ` +
-      `${allFacilities.length} facilities (${facilitiesAdded} new, ` +
+      `${allFacilities.length} facilities (${facilitiesAdded} new, ${facilitiesUpdated} updated, ` +
       `${seedPharmacies.length} pharmacies), ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
