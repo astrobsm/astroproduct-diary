@@ -6,6 +6,7 @@ import type {
   Course,
   Enrollment,
   Facility,
+  Doctor,
   FollowUp,
   GeoState,
   GeoZone,
@@ -28,6 +29,7 @@ import type {
   ContactFilter,
   CourseFilter,
   FacilityFilter,
+  DoctorFilter,
   FollowUpFilter,
   ProductFilter,
   QuizLocation,
@@ -52,6 +54,7 @@ export class MemoryRepository implements Repository {
   private zones: GeoZone[] = structuredClone(geoZones);
   private states: GeoState[] = structuredClone(geoStates);
   private facilities: Facility[] = [];
+  private doctors: Doctor[] = [];
   private contacts: Contact[] = [];
   private interactions: Interaction[] = [];
   private followUps: FollowUp[] = [];
@@ -397,6 +400,45 @@ export class MemoryRepository implements Repository {
     };
     this.facilities.push(facility);
     return facility;
+  }
+
+  // --- Specialist Doctors Directory ---
+  async listDoctors(filter: DoctorFilter = {}): Promise<Doctor[]> {
+    const q = filter.q?.trim().toLowerCase();
+    return this.doctors.filter((d) => {
+      if (filter.specialty && d.specialty !== filter.specialty) return false;
+      if (filter.facilityId && d.facilityId !== filter.facilityId) return false;
+      if (filter.stateId && d.stateId !== filter.stateId) return false;
+      if (filter.zoneId && d.zoneId !== filter.zoneId) return false;
+      if (
+        q &&
+        !`${d.fullName} ${d.hospitalName ?? ""} ${d.city ?? ""}`.toLowerCase().includes(q)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+  async getDoctorById(id: string): Promise<Doctor | undefined> {
+    return this.doctors.find((d) => d.id === id);
+  }
+  async hasDoctor(fullName: string, facilityId?: string): Promise<boolean> {
+    const norm = fullName.trim().toLowerCase();
+    return this.doctors.some(
+      (d) =>
+        d.fullName.trim().toLowerCase() === norm &&
+        (facilityId ? d.facilityId === facilityId : true)
+    );
+  }
+  async addDoctor(data: Omit<Doctor, "id" | "createdAt">): Promise<Doctor> {
+    const doctor: Doctor = {
+      ...data,
+      id: `doc-${randomUUID()}`,
+      verificationStatus: data.verifiedAt ? "VERIFIED" : "UNVERIFIED",
+      createdAt: new Date().toISOString()
+    };
+    this.doctors.push(doctor);
+    return doctor;
   }
 
   // --- CRM ---

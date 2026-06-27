@@ -14,6 +14,7 @@ const Academy = lazy(() => import("./pages/Academy"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const MyLearning = lazy(() => import("./pages/MyLearning"));
 const Hospitals = lazy(() => import("./pages/Hospitals"));
+const Doctors = lazy(() => import("./pages/Doctors"));
 const Crm = lazy(() => import("./pages/Crm"));
 const Marketing = lazy(() => import("./pages/Marketing"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/research" element={<Research />} />
         <Route path="/hospitals" element={<Hospitals />} />
+        <Route path="/doctors" element={<Doctors />} />
         <Route path="/academy" element={<Academy />} />
         <Route path="/academy/:slug" element={<CourseDetail />} />
         <Route

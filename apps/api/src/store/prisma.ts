@@ -7,6 +7,7 @@ import type {
   CourseModule,
   Enrollment,
   Facility,
+  Doctor,
   FollowUp,
   GeoState,
   GeoZone,
@@ -29,6 +30,7 @@ import type {
   ContactFilter,
   CourseFilter,
   FacilityFilter,
+  DoctorFilter,
   FollowUpFilter,
   ProductFilter,
   QuizLocation,
@@ -321,6 +323,43 @@ function toFacility(f: {
     verifiedAt: f.verifiedAt?.toISOString(),
     verificationStatus: f.verifiedAt ? "VERIFIED" : "UNVERIFIED",
     createdAt: f.createdAt.toISOString()
+  };
+}
+
+function toDoctor(d: {
+  id: string;
+  fullName: string;
+  title: string | null;
+  specialty: string;
+  facilityId: string | null;
+  hospitalName: string | null;
+  zoneId: string | null;
+  stateId: string | null;
+  city: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  source: string;
+  verifiedAt: Date | null;
+  createdAt: Date;
+}): Doctor {
+  return {
+    id: d.id,
+    fullName: d.fullName,
+    title: d.title ?? undefined,
+    specialty: d.specialty as Doctor["specialty"],
+    facilityId: d.facilityId ?? undefined,
+    hospitalName: d.hospitalName ?? undefined,
+    zoneId: d.zoneId ?? undefined,
+    stateId: d.stateId ?? undefined,
+    city: d.city ?? undefined,
+    phone: d.phone ?? undefined,
+    email: d.email ?? undefined,
+    website: d.website ?? undefined,
+    source: d.source,
+    verifiedAt: d.verifiedAt?.toISOString(),
+    verificationStatus: d.verifiedAt ? "VERIFIED" : "UNVERIFIED",
+    createdAt: d.createdAt.toISOString()
   };
 }
 
@@ -1113,6 +1152,62 @@ export class PrismaRepository implements Repository {
       }
     });
     return toFacility(row);
+  }
+
+  // --- Specialist Doctors Directory ---
+  async listDoctors(filter: DoctorFilter = {}): Promise<Doctor[]> {
+    const rows = await prisma.doctor.findMany({
+      where: {
+        ...(filter.specialty ? { specialty: filter.specialty } : {}),
+        ...(filter.facilityId ? { facilityId: filter.facilityId } : {}),
+        ...(filter.stateId ? { stateId: filter.stateId } : {}),
+        ...(filter.zoneId ? { zoneId: filter.zoneId } : {}),
+        ...(filter.q
+          ? {
+              OR: [
+                { fullName: { contains: filter.q, mode: "insensitive" } },
+                { hospitalName: { contains: filter.q, mode: "insensitive" } },
+                { city: { contains: filter.q, mode: "insensitive" } }
+              ]
+            }
+          : {})
+      },
+      orderBy: { fullName: "asc" }
+    });
+    return rows.map(toDoctor);
+  }
+  async getDoctorById(id: string): Promise<Doctor | undefined> {
+    const row = await prisma.doctor.findUnique({ where: { id } });
+    return row ? toDoctor(row) : undefined;
+  }
+  async hasDoctor(fullName: string, facilityId?: string): Promise<boolean> {
+    const count = await prisma.doctor.count({
+      where: {
+        fullName: { equals: fullName, mode: "insensitive" },
+        ...(facilityId ? { facilityId } : {})
+      }
+    });
+    return count > 0;
+  }
+  async addDoctor(data: Omit<Doctor, "id" | "createdAt">): Promise<Doctor> {
+    const row = await prisma.doctor.create({
+      data: {
+        fullName: data.fullName,
+        title: data.title,
+        specialty: data.specialty,
+        facilityId: data.facilityId,
+        hospitalName: data.hospitalName,
+        zoneId: data.zoneId,
+        stateId: data.stateId,
+        city: data.city,
+        phone: data.phone,
+        email: data.email,
+        website: data.website,
+        source: data.source,
+        verifiedAt: data.verifiedAt ? new Date(data.verifiedAt) : null
+      }
+    });
+    return toDoctor(row);
   }
 
   // --- CRM ---

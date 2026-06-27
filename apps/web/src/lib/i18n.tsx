@@ -15,6 +15,7 @@ const DICT: Record<string, { en: string; fr: string }> = {
   "nav.products": { en: "Products", fr: "Produits" },
   "nav.research": { en: "Evidence", fr: "Preuves" },
   "nav.hospitals": { en: "Hospitals", fr: "Hôpitaux" },
+  "nav.doctors": { en: "Doctors", fr: "Médecins" },
   "nav.academy": { en: "Academy", fr: "Académie" },
   "nav.coach": { en: "Coach", fr: "Coach" },
   "nav.insights": { en: "Insights", fr: "Analyses" },
@@ -27,6 +28,26 @@ const DICT: Record<string, { en: string; fr: string }> = {
   "nav.settings": { en: "Settings", fr: "Paramètres" },
   "nav.signin": { en: "Sign in", fr: "Connexion" },
   "nav.signout": { en: "Sign out", fr: "Déconnexion" },
+  "nav.menu": { en: "Menu", fr: "Menu" },
+  "nav.close": { en: "Close", fr: "Fermer" },
+
+  "install.cta": { en: "Install app", fr: "Installer l'app" },
+  "install.title": { en: "Install ASTROBSM Academy", fr: "Installer ASTROBSM Académie" },
+  "install.body": {
+    en: "Add the app to your home screen for fast, full-screen, offline-ready access.",
+    fr: "Ajoutez l'application à votre écran d'accueil pour un accès rapide, plein écran et hors ligne."
+  },
+  "install.button": { en: "Install", fr: "Installer" },
+  "install.dismiss": { en: "Not now", fr: "Plus tard" },
+  "install.iosTitle": { en: "Add to Home Screen", fr: "Ajouter à l'écran d'accueil" },
+  "install.iosStep1": {
+    en: "Tap the Share button in Safari",
+    fr: "Touchez le bouton Partager dans Safari"
+  },
+  "install.iosStep2": {
+    en: "Choose “Add to Home Screen”",
+    fr: "Choisissez « Sur l'écran d'accueil »"
+  },
 
   "home.badge": { en: "Nigeria · Sub-Saharan Africa · EN / FR", fr: "Nigéria · Afrique subsaharienne · EN / FR" },
   "home.title": {

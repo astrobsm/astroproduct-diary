@@ -222,6 +222,44 @@ export const hospitalsApi = {
     return data;
   }
 };
+
+export interface ApiDoctor {
+  id: string;
+  fullName: string;
+  title?: string;
+  specialty: string;
+  facilityId?: string;
+  hospitalName?: string;
+  zoneId?: string;
+  stateId?: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  source: string;
+  verifiedAt?: string;
+  verificationStatus?: "VERIFIED" | "UNVERIFIED";
+  createdAt: string;
+}
+
+export interface DoctorQuery {
+  specialty?: string;
+  facilityId?: string;
+  stateId?: string;
+  zoneId?: string;
+  q?: string;
+}
+
+export const doctorsApi = {
+  async doctors(query: DoctorQuery = {}, signal?: AbortSignal): Promise<ApiDoctor[]> {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(query)) if (v) params.set(k, v);
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    const { data } = await get<{ data: ApiDoctor[] }>(`/doctors${qs}`, signal);
+    return data;
+  }
+};
+
 export interface ProductInput {
   slug: string;
   name: string;

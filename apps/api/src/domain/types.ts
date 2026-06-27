@@ -235,6 +235,49 @@ export interface Facility {
 }
 
 // ---------------------------------------------------------------------------
+// Specialist Doctors Directory
+// ---------------------------------------------------------------------------
+
+export type DoctorSpecialty =
+  | "PLASTIC_SURGERY"
+  | "BURN_CARE"
+  | "GENERAL_SURGERY"
+  | "ORTHOPAEDIC_SURGERY"
+  | "VASCULAR_SURGERY"
+  | "DERMATOLOGY"
+  | "WOUND_CARE_NURSING"
+  | "OTHER";
+
+/**
+ * A specialist clinician who can be contacted for appointments and wound-care
+ * protocol / seminar dissemination. Like facilities, contact details are only
+ * present when published by a verifiable source — `source` (provenance) is
+ * required and `verifiedAt` records confirmation. Never fabricated.
+ */
+export interface Doctor {
+  id: string;
+  fullName: string;
+  title?: string;
+  specialty: DoctorSpecialty;
+  /** Linked facility (when the doctor practises at a known hospital). */
+  facilityId?: string;
+  /** Free-text hospital/clinic name when not linked to a facility record. */
+  hospitalName?: string;
+  zoneId?: string;
+  stateId?: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  /** Provenance: where this record was sourced from (URL / register name). */
+  source: string;
+  verifiedAt?: string;
+  /** Derived on read: GREEN when confirmed against a published source, AMBER otherwise. */
+  verificationStatus?: "VERIFIED" | "UNVERIFIED";
+  createdAt: string;
+}
+
+// ---------------------------------------------------------------------------
 // CRM
 // ---------------------------------------------------------------------------
 

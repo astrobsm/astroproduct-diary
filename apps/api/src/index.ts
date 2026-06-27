@@ -8,6 +8,7 @@ import { productsRouter } from "./routes/products.routes";
 import { researchRouter } from "./routes/research.routes";
 import { lmsRouter } from "./routes/lms.routes";
 import { hospitalsRouter } from "./routes/hospitals.routes";
+import { doctorsRouter } from "./routes/doctors.routes";
 import { crmRouter } from "./routes/crm.routes";
 import { campaignsRouter } from "./routes/campaigns.routes";
 import { analyticsRouter } from "./routes/analytics.routes";
@@ -44,6 +45,7 @@ v1.get("/", (_req, res) => {
       "research",
       "lms",
       "hospitals",
+      "doctors",
       "crm",
       "campaigns",
       "analytics",
@@ -64,6 +66,7 @@ v1.use("/analytics", analyticsRouter);
 v1.use("/tot", totRouter);
 v1.use("/coach", coachRouter);
 v1.use("/", hospitalsRouter);
+v1.use("/", doctorsRouter);
 
 app.use("/api/v1", v1);
 

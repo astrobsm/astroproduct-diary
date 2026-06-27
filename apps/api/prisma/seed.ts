@@ -16,6 +16,7 @@ import {
   FACILITY_VERIFIED_AT
 } from "../src/data/facilities";
 import { seedPharmacies, PHARMACY_SOURCE } from "../src/data/pharmacies";
+import { seedDoctors, DOCTOR_SOURCE, DOCTOR_VERIFIED_AT } from "../src/data/doctors";
 import { hashPassword } from "../src/auth/security";
 
 const prisma = new PrismaClient();
@@ -235,11 +236,53 @@ async function main() {
     facilitiesAdded += 1;
   }
 
+  // --- Specialist Doctors Directory ---
+  // Each seed doctor is matched to its host facility (by name + state) so the
+  // record carries facilityId/zoneId; idempotent on fullName + facility.
+  let doctorsAdded = 0;
+  for (const d of seedDoctors) {
+    const state = stateById.get(d.stateId);
+    if (!state) {
+      console.warn(`Skipping doctor "${d.fullName}": unknown stateId "${d.stateId}"`);
+      continue;
+    }
+    const facility = await prisma.facility.findFirst({
+      where: { name: d.hospitalName, stateId: d.stateId }
+    });
+    const existing = await prisma.doctor.findFirst({
+      where: {
+        fullName: d.fullName,
+        ...(facility ? { facilityId: facility.id } : { hospitalName: d.hospitalName })
+      }
+    });
+    if (existing) continue;
+    const isVerified = d.verified !== false;
+    await prisma.doctor.create({
+      data: {
+        fullName: d.fullName,
+        title: d.title ?? null,
+        specialty: d.specialty,
+        facilityId: facility?.id ?? null,
+        hospitalName: d.hospitalName,
+        zoneId: facility?.zoneId ?? state.zoneId,
+        stateId: d.stateId,
+        city: d.city ?? null,
+        phone: d.phone ?? null,
+        email: d.email ?? null,
+        website: d.website ?? null,
+        source: d.source ?? DOCTOR_SOURCE,
+        verifiedAt: isVerified ? new Date(DOCTOR_VERIFIED_AT) : null
+      }
+    });
+    doctorsAdded += 1;
+  }
+
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
       `${geoZones.length} zones, ${geoStates.length} states, ` +
       `${allFacilities.length} facilities (${facilitiesAdded} new, ${facilitiesUpdated} updated, ` +
       `${seedPharmacies.length} pharmacies), ` +
+      `${seedDoctors.length} doctors (${doctorsAdded} new), ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
 }

@@ -4,6 +4,7 @@ import {
   api,
   lmsApi,
   hospitalsApi,
+  doctorsApi,
   type ApiProduct,
   type ApiRef,
   type ApiCourseSummary,
@@ -11,7 +12,9 @@ import {
   type ApiZone,
   type ApiState,
   type ApiFacility,
-  type FacilityQuery
+  type FacilityQuery,
+  type ApiDoctor,
+  type DoctorQuery
 } from "./api";
 
 export interface RefView {
@@ -226,6 +229,23 @@ export async function loadFacilities(
 ): Promise<{ data: FacilityView[]; source: DataSource }> {
   try {
     const data = await hospitalsApi.facilities(query, signal);
+    return { data, source: "live" };
+  } catch {
+    return { data: [], source: "offline" };
+  }
+}
+
+// ---- Specialist Doctors Directory ----
+// Doctors are served by the live API only — never bundled offline. Contact
+// details exist solely when published by a verifiable source.
+export type DoctorView = ApiDoctor;
+
+export async function loadDoctors(
+  query: DoctorQuery = {},
+  signal?: AbortSignal
+): Promise<{ data: DoctorView[]; source: DataSource }> {
+  try {
+    const data = await doctorsApi.doctors(query, signal);
     return { data, source: "live" };
   } catch {
     return { data: [], source: "offline" };

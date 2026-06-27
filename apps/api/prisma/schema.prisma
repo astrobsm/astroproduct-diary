@@ -410,6 +410,38 @@ model Facility {
   contacts   Contact[]
   interactions Interaction[]
   orders     Order[]
+  doctors    Doctor[]
+}
+
+// ---------------------------------------------------------------------------
+// Specialist Doctors Directory
+// ---------------------------------------------------------------------------
+
+// A specialist clinician (plastic/burn/wound/general/orthopaedic/vascular
+// surgeon, dermatologist, wound-care nurse specialist) who can be contacted for
+// appointments and wound-care protocol / seminar dissemination. Contact details
+// are ONLY stored when published by a verifiable source — never fabricated.
+model Doctor {
+  id           String    @id @default(cuid())
+  fullName     String
+  title        String?
+  specialty    String
+  facilityId   String?
+  hospitalName String?
+  zoneId       String?
+  stateId      String?
+  city         String?
+  phone        String?
+  email        String?
+  website      String?
+  source       String
+  verifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  facility     Facility? @relation(fields: [facilityId], references: [id])
+
+  @@index([specialty])
+  @@index([facilityId])
+  @@index([stateId])
 }
 
 model ImportBatch {

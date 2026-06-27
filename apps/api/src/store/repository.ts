@@ -5,6 +5,7 @@ import type {
   Course,
   Enrollment,
   Facility,
+  Doctor,
   FollowUp,
   GeoState,
   GeoZone,
@@ -50,6 +51,14 @@ export interface FacilityFilter {
   zoneId?: string;
   stateId?: string;
   type?: string;
+  q?: string;
+}
+
+export interface DoctorFilter {
+  specialty?: string;
+  facilityId?: string;
+  stateId?: string;
+  zoneId?: string;
   q?: string;
 }
 
@@ -148,6 +157,12 @@ export interface Repository {
   getFacilityById(id: string): Promise<Facility | undefined>;
   hasFacility(name: string, stateId: string): Promise<boolean>;
   addFacility(data: Omit<Facility, "id" | "createdAt">): Promise<Facility>;
+
+  // Specialist Doctors Directory
+  listDoctors(filter?: DoctorFilter): Promise<Doctor[]>;
+  getDoctorById(id: string): Promise<Doctor | undefined>;
+  hasDoctor(fullName: string, facilityId?: string): Promise<boolean>;
+  addDoctor(data: Omit<Doctor, "id" | "createdAt">): Promise<Doctor>;
 
   // CRM
   listContacts(filter?: ContactFilter): Promise<Contact[]>;
