@@ -15,6 +15,7 @@ import {
   FACILITY_SOURCE_UNVERIFIED,
   FACILITY_VERIFIED_AT
 } from "../src/data/facilities";
+import { seedPharmacies, PHARMACY_SOURCE } from "../src/data/pharmacies";
 import { hashPassword } from "../src/auth/security";
 
 const prisma = new PrismaClient();
@@ -183,8 +184,13 @@ async function main() {
   // Provenance is recorded; contact details are intentionally left blank.
   const stateById = new Map(geoStates.map((s) => [s.id, s]));
   const stateNameById = new Map(geoStates.map((s) => [s.id, s.name]));
+  // Pharmacies default their provenance to the MedPlus official directory.
+  const allFacilities = [
+    ...seedFacilities,
+    ...seedPharmacies.map((p) => ({ ...p, source: p.source ?? PHARMACY_SOURCE }))
+  ];
   let facilitiesAdded = 0;
-  for (const f of seedFacilities) {
+  for (const f of allFacilities) {
     const state = stateById.get(f.stateId);
     if (!state) {
       console.warn(`Skipping "${f.name}": unknown stateId "${f.stateId}"`);
@@ -216,7 +222,8 @@ async function main() {
   console.log(
     `Seed complete: ${ROLE_KEYS.length} roles, 1 admin (${email}), ` +
       `${geoZones.length} zones, ${geoStates.length} states, ` +
-      `${seedFacilities.length} facilities (${facilitiesAdded} new), ` +
+      `${allFacilities.length} facilities (${facilitiesAdded} new, ` +
+      `${seedPharmacies.length} pharmacies), ` +
       `${seedReferences.length} references, ${seedProducts.length} products.`
   );
 }

@@ -24,7 +24,8 @@ export type SeedFacilityType =
   | "TEACHING_HOSPITAL"
   | "FEDERAL_MEDICAL_CENTRE"
   | "SPECIALIST_HOSPITAL"
-  | "GENERAL_HOSPITAL";
+  | "GENERAL_HOSPITAL"
+  | "PHARMACY";
 
 export interface SeedFacility {
   name: string;
