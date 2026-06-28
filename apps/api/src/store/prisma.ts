@@ -473,6 +473,7 @@ function toSeminar(s: {
   title: string;
   facilityId: string | null;
   venue: string | null;
+  imageUrl: string | null;
   scheduledAt: Date | null;
   organizerId: string | null;
   status: string;
@@ -485,6 +486,7 @@ function toSeminar(s: {
     campaignId: s.campaignId ?? undefined,
     facilityId: s.facilityId ?? undefined,
     venue: s.venue ?? undefined,
+    imageUrl: s.imageUrl ?? undefined,
     startAt: (s.scheduledAt ?? new Date(0)).toISOString(),
     createdById: s.organizerId ?? "",
     createdAt: new Date(0).toISOString()
@@ -1367,6 +1369,7 @@ export class PrismaRepository implements Repository {
         campaignId: data.campaignId,
         facilityId: data.facilityId,
         venue: data.venue,
+        imageUrl: data.imageUrl,
         scheduledAt: new Date(data.startAt),
         organizerId: data.createdById
       }

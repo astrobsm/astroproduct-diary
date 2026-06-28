@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { CalendarDays, Loader2, Megaphone, PlusCircle, Users } from "lucide-react";
 import { useAuth } from "../lib/auth";
+import ImageUploadField from "../components/ImageUploadField";
 import {
   marketingAuthApi,
   type ApiCampaign,
@@ -68,7 +69,8 @@ export default function Marketing() {
     venue: string;
     startAt: string;
     capacity: string;
-  }>({ title: "", summary: "", campaignId: "", venue: "", startAt: "", capacity: "" });
+    imageUrl: string;
+  }>({ title: "", summary: "", campaignId: "", venue: "", startAt: "", capacity: "", imageUrl: "" });
 
   const [selectedSeminar, setSelectedSeminar] = useState<string | null>(null);
   const [registrations, setRegistrations] = useState<ApiRegistration[]>([]);
@@ -167,11 +169,12 @@ export default function Marketing() {
         summary: seminarForm.summary.trim(),
         campaignId: seminarForm.campaignId || undefined,
         venue: seminarForm.venue.trim() || undefined,
+        imageUrl: seminarForm.imageUrl || undefined,
         startAt,
         capacity: seminarForm.capacity ? Number(seminarForm.capacity) : undefined
       };
       await marketingAuthApi.createSeminar(authFetch, input);
-      setSeminarForm({ title: "", summary: "", campaignId: "", venue: "", startAt: "", capacity: "" });
+      setSeminarForm({ title: "", summary: "", campaignId: "", venue: "", startAt: "", capacity: "", imageUrl: "" });
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save seminar");
@@ -404,6 +407,16 @@ export default function Marketing() {
                     </option>
                   ))}
                 </select>
+                <div>
+                  <p className="mb-1 text-xs font-semibold text-slate-600">Event flyer / photo (optional)</p>
+                  <ImageUploadField
+                    label={seminarForm.title || "seminar"}
+                    value={seminarForm.imageUrl}
+                    onChange={(v) => setSeminarForm((f) => ({ ...f, imageUrl: v }))}
+                    disabled={busy}
+                    hint="Attach a banner for the seminar or outreach. Upload from your device or paste a URL."
+                  />
+                </div>
               </div>
               <button
                 type="submit"
@@ -438,6 +451,13 @@ export default function Marketing() {
                           {s.status}
                         </span>
                       </button>
+                      {s.imageUrl && (
+                        <img
+                          src={s.imageUrl}
+                          alt={s.title}
+                          className="mt-2 h-32 w-full rounded-lg border object-cover"
+                        />
+                      )}
                       <p className="text-slate-500">{s.summary}</p>
                       <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
                         <span className="flex items-center gap-2">

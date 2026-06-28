@@ -11,6 +11,7 @@ import {
   XCircle
 } from "lucide-react";
 import { useAuth } from "../../lib/auth";
+import ImageUploadField from "../../components/ImageUploadField";
 import {
   adminApi,
   adminUsersApi,
@@ -165,37 +166,27 @@ function ProductImages() {
     <div className="space-y-4">
       {error && <p className="text-sm text-red-600">{error}</p>}
       <p className="text-xs text-slate-500">
-        Paste a public image URL (e.g. a Supabase Storage link) or a path served from{" "}
-        <code className="rounded bg-slate-100 px-1">/products/</code>. Changes save to the catalogue
-        immediately.
+        Tap <span className="font-semibold">Upload image</span> to attach a photo from your phone or
+        computer, or paste a public image URL. Changes save to the catalogue when you press Save.
       </p>
       <ul className="space-y-3">
         {products.map((p) => (
-          <li key={p.id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
-            <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-lg bg-slate-100">
-              {drafts[p.id] ? (
-                <img src={drafts[p.id]} alt={p.name} className="h-full w-full object-cover" />
-              ) : (
-                <ImageIcon className="h-5 w-5 text-slate-400" />
-              )}
-            </span>
-            <div className="min-w-[180px] flex-1">
+          <li key={p.id} className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-start">
+            <div className="min-w-0 flex-1">
               <p className="font-semibold text-slate-800">{p.name}</p>
-              <label htmlFor={`img-${p.id}`} className="sr-only">
-                Image URL for {p.name}
-              </label>
-              <input
-                id={`img-${p.id}`}
-                value={drafts[p.id] ?? ""}
-                onChange={(e) => setDrafts((d) => ({ ...d, [p.id]: e.target.value }))}
-                placeholder="https://… or /products/woundclex.jpg"
-                className="mt-1 w-full rounded-lg border px-3 py-1.5 text-sm outline-none focus:border-brand-blue"
-              />
+              <div className="mt-2">
+                <ImageUploadField
+                  label={p.name}
+                  value={drafts[p.id] ?? ""}
+                  onChange={(v) => setDrafts((d) => ({ ...d, [p.id]: v }))}
+                  disabled={savingId === p.id}
+                />
+              </div>
             </div>
             <button
               onClick={() => save(p)}
               disabled={savingId === p.id}
-              className="inline-flex items-center gap-1 rounded-lg bg-brand-navy px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-1 rounded-lg bg-brand-navy px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-blue disabled:opacity-60 sm:mt-7"
             >
               {savingId === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Save

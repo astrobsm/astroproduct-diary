@@ -530,6 +530,7 @@ model Seminar {
   type        String // CME, WORKSHOP, PRODUCT_LAUNCH
   facilityId  String?
   venue       String?
+  imageUrl    String?
   scheduledAt DateTime?
   organizerId String?
   status      String            @default("SCHEDULED")

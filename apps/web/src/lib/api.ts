@@ -618,6 +618,7 @@ export interface ApiSeminar {
   city?: string;
   stateId?: string;
   venue?: string;
+  imageUrl?: string;
   startAt: string;
   endAt?: string;
   capacity?: number;
@@ -657,6 +658,7 @@ export interface SeminarInput {
   city?: string;
   stateId?: string;
   venue?: string;
+  imageUrl?: string;
   startAt: string;
   endAt?: string;
   capacity?: number;

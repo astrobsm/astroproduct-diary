@@ -72,6 +72,7 @@ const seminarSchema = z.object({
   city: z.string().optional(),
   stateId: z.string().optional(),
   venue: z.string().optional(),
+  imageUrl: z.string().optional(),
   startAt: z.string().datetime(),
   endAt: z.string().datetime().optional(),
   capacity: z.number().int().positive().optional()

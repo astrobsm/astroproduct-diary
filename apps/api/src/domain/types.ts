@@ -371,6 +371,8 @@ export interface Seminar {
   city?: string;
   stateId?: string;
   venue?: string;
+  /** Optional flyer/banner image (URL or data URL) for the event. */
+  imageUrl?: string;
   startAt: string;
   endAt?: string;
   capacity?: number;
