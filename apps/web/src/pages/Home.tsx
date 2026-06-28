@@ -7,7 +7,10 @@ import {
   Package,
   Users
 } from "lucide-react";
-import { products } from "../data/products";
+import ProductImage from "../components/ProductImage";
+import { products as localProducts } from "../data/products";
+import { useLoader } from "../lib/hooks";
+import { loadProducts, type ProductView } from "../lib/source";
 import { useI18n } from "../lib/i18n";
 
 const pillars = [
@@ -19,6 +22,10 @@ const pillars = [
 
 export default function Home() {
   const { t } = useI18n();
+  const { data } = useLoader<ProductView[]>((signal) => loadProducts(signal), []);
+  // Prefer live products (includes admin-uploaded images); fall back to the
+  // bundled catalogue so the home page still renders offline / before load.
+  const featured = (data && data.length > 0 ? data : localProducts).slice(0, 3);
   return (
     <div className="space-y-10">
       <section className="rounded-2xl bg-brand-navy px-6 py-10 text-white sm:px-10">
@@ -66,17 +73,13 @@ export default function Home() {
           </Link>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {products.slice(0, 3).map((p) => (
+          {featured.map((p) => (
             <Link
               key={p.slug}
               to={`/products/${p.slug}`}
               className="group rounded-xl border bg-white p-4 transition hover:shadow-md"
             >
-              <div className="h-32">
-                <div className="flex h-full items-center justify-center rounded-lg bg-slate-50 text-sm font-semibold text-brand-navy">
-                  {p.name}
-                </div>
-              </div>
+              <ProductImage product={p} className="h-32" />
               <h3 className="mt-3 font-semibold text-slate-800 group-hover:text-brand-blue">
                 {p.name}
               </h3>
