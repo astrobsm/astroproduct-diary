@@ -278,7 +278,18 @@ type AuthFetch = (path: string, init?: RequestInit) => Promise<Response>;
 
 async function readError(res: Response): Promise<never> {
   const body = await res.json().catch(() => null);
-  throw new Error(body?.error?.message ?? `API ${res.status}`);
+  const err = body?.error;
+  let message = err?.message ?? `API ${res.status}`;
+  // Surface Zod field paths (422 VALIDATION_ERROR) so the user knows what to fix.
+  if (Array.isArray(err?.details) && err.details.length > 0) {
+    const fields = err.details
+      .map((d: { path?: (string | number)[]; message?: string }) =>
+        d.path && d.path.length > 0 ? `${d.path.join(".")}: ${d.message ?? "invalid"}` : d.message
+      )
+      .filter(Boolean);
+    if (fields.length > 0) message = `${message} — ${fields.join("; ")}`;
+  }
+  throw new Error(message);
 }
 
 /**

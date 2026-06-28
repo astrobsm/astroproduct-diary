@@ -84,9 +84,34 @@ export default function ProductForm() {
     setSaving(true);
     setError(null);
     try {
+      // Drop incomplete nested rows so a stray empty field never trips the
+      // server-side validation (422). Mirrors the API's min-length rules.
       const payload: ProductInput = {
         ...form,
-        image: form.image?.trim() ? form.image : undefined
+        name: form.name.trim(),
+        slug: form.slug.trim(),
+        category: form.category.trim(),
+        tagline: form.tagline.trim(),
+        summary: form.summary.trim(),
+        image: form.image?.trim() ? form.image : undefined,
+        ingredients: form.ingredients
+          .map((i) => ({
+            name: i.name.trim(),
+            percent: i.percent?.trim() || undefined,
+            role: i.role.trim()
+          }))
+          .filter((i) => i.name.length > 0),
+        sections: form.sections
+          .map((s) => ({
+            type: s.type,
+            title: s.title.trim(),
+            items: s.items.map((it) => it.trim()).filter(Boolean)
+          }))
+          .filter((s) => s.title.length > 0),
+        faqs: form.faqs
+          .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }))
+          .filter((f) => f.question.length > 0 && f.answer.length > 0),
+        references: form.references.map((r) => r.trim()).filter(Boolean)
       };
       if (isEdit && id) {
         await adminApi.updateProduct(authFetch, id, payload);
