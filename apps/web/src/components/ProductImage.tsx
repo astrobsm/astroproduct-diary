@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 
 interface ProductImageData {
@@ -20,6 +20,10 @@ export default function ProductImage({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  // Reset the failed state when the image changes so a stale 404 (e.g. the
+  // bundled fallback path) doesn't keep us on the placeholder after the live
+  // uploaded image arrives.
+  useEffect(() => setFailed(false), [product.image]);
   const showImage = product.image && !failed;
 
   return (
