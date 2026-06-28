@@ -28,7 +28,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({ origin: config.corsOrigin }));
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "12mb" }));
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "astrobsm-api", time: new Date().toISOString() });
