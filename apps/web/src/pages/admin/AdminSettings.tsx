@@ -180,6 +180,7 @@ function ProductImages() {
                   value={drafts[p.id] ?? ""}
                   onChange={(v) => setDrafts((d) => ({ ...d, [p.id]: v }))}
                   disabled={savingId === p.id}
+                  kind="product"
                 />
               </div>
             </div>

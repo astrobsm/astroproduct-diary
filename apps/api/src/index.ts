@@ -14,6 +14,7 @@ import { campaignsRouter } from "./routes/campaigns.routes";
 import { analyticsRouter } from "./routes/analytics.routes";
 import { totRouter } from "./routes/tot.routes";
 import { coachRouter } from "./routes/coach.routes";
+import { uploadsRouter } from "./routes/uploads.routes";
 
 /**
  * ASTROBSM API — Phase 2.
@@ -50,7 +51,8 @@ v1.get("/", (_req, res) => {
       "campaigns",
       "analytics",
       "tot",
-      "coach"
+      "coach",
+      "uploads"
     ],
     note: "Phase 2: live products + research with import pipeline; LMS course catalog + enrollment; National Hospital Database (geo + facilities)."
   });
@@ -65,6 +67,7 @@ v1.use("/marketing", campaignsRouter);
 v1.use("/analytics", analyticsRouter);
 v1.use("/tot", totRouter);
 v1.use("/coach", coachRouter);
+v1.use("/uploads", uploadsRouter);
 v1.use("/", hospitalsRouter);
 v1.use("/", doctorsRouter);
 

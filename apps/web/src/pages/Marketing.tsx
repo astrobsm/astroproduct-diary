@@ -414,6 +414,7 @@ export default function Marketing() {
                     value={seminarForm.imageUrl}
                     onChange={(v) => setSeminarForm((f) => ({ ...f, imageUrl: v }))}
                     disabled={busy}
+                    kind="seminar"
                     hint="Attach a banner for the seminar or outreach. Upload from your device or paste a URL."
                   />
                 </div>

@@ -318,6 +318,36 @@ export const adminApi = {
   }
 };
 
+export interface UploadResult {
+  /** Hosted Supabase Storage URL when stored, else the original data URL. */
+  url: string;
+  /** True when the image was persisted as a file in Supabase Storage. */
+  stored: boolean;
+  reason?: string;
+}
+
+/**
+ * Upload an image data URL to the server for durable Supabase Storage backup.
+ * Falls back to the inline data URL when storage is not configured or the
+ * upload fails, so callers always receive a usable `url`.
+ */
+export const uploadsApi = {
+  async upload(
+    authFetch: AuthFetch,
+    dataUrl: string,
+    kind: "product" | "seminar" | "misc" = "misc"
+  ): Promise<UploadResult> {
+    const res = await authFetch("/uploads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dataUrl, kind })
+    });
+    if (!res.ok) await readError(res);
+    const { data } = await res.json();
+    return data as UploadResult;
+  }
+};
+
 /**
  * Authenticated Academy (LMS) calls for learners: enroll, submit quiz
  * attempts, and read the current learner's enrollments / certificates.

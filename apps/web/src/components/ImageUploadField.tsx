@@ -1,6 +1,8 @@
 import { useId, useRef, useState } from "react";
 import { ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { compressImageFile } from "../lib/image";
+import { uploadsApi } from "../lib/api";
+import { useAuth } from "../lib/auth";
 
 interface ImageUploadFieldProps {
   value: string;
@@ -11,6 +13,8 @@ interface ImageUploadFieldProps {
   hint?: string;
   /** Disable all controls (e.g. while a parent save is in flight). */
   disabled?: boolean;
+  /** Storage folder for the durable backup (products vs seminars). */
+  kind?: "product" | "seminar" | "misc";
 }
 
 /**
@@ -23,8 +27,10 @@ export default function ImageUploadField({
   onChange,
   label,
   hint,
-  disabled = false
+  disabled = false,
+  kind = "misc"
 }: ImageUploadFieldProps) {
+  const { authFetch } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
   const [busy, setBusy] = useState(false);
@@ -36,7 +42,14 @@ export default function ImageUploadField({
     setError(null);
     try {
       const dataUrl = await compressImageFile(file);
-      onChange(dataUrl);
+      // Try a durable Supabase Storage backup; fall back to the inline data
+      // URL if storage is not configured, offline, or the upload fails.
+      try {
+        const result = await uploadsApi.upload(authFetch, dataUrl, kind);
+        onChange(result.url || dataUrl);
+      } catch {
+        onChange(dataUrl);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not process the image.");
     } finally {
