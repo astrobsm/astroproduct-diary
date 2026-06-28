@@ -176,7 +176,7 @@ export const products: Product[] = [
   },
   {
     slug: "honey-gauze",
-    name: "Wound-Care Honey Gauze (Heratex)",
+    name: "Wound-Care Honey Gauze",
     tagline: "Honey-impregnated contact dressing",
     category: "Dressing",
     summary:

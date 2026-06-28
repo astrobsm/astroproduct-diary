@@ -302,7 +302,7 @@ export const seedProducts: Product[] = [
   {
     id: "prod-honey-gauze",
     slug: "honey-gauze",
-    name: "Wound-Care Honey Gauze (Heratex)",
+    name: "Wound-Care Honey Gauze",
     tagline: "Honey-impregnated contact dressing",
     category: "Dressing",
     summary:

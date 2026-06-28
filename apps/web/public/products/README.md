@@ -8,7 +8,7 @@ references these paths; a branded placeholder is shown until the file exists):
 | ------------------------------- | ------------------------------------ |
 | `hera-wound-gel.jpg`            | Hera Wound Gel                       |
 | `wound-clex.jpg`                | Wound-Clex Solution                  |
-| `honey-gauze.jpg`               | Wound-Care Honey Gauze (Heratex)     |
+| `honey-gauze.jpg`               | Wound-Care Honey Gauze               |
 | `sterile-dressing-pack.jpg`     | Sterile Dressing Pack                |
 
 Recommended: square-ish JP/PNG, at least 800×800px, on a clean background.
