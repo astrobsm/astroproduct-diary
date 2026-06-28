@@ -23,7 +23,11 @@ export default defineConfig({
             method: "GET",
             options: {
               cacheName: "astrobsm-api",
-              networkTimeoutSeconds: 5,
+              // Give larger responses (e.g. product lists with inline images)
+              // time to arrive on slow mobile links before falling back to
+              // cache. When fully offline, fetch rejects immediately, so the
+              // cached copy is still served without waiting this long.
+              networkTimeoutSeconds: 20,
               expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 7 },
               cacheableResponse: { statuses: [0, 200] }
             }
