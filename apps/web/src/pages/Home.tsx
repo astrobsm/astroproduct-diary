@@ -20,12 +20,22 @@ const pillars = [
   { icon: Users, key: "crm" }
 ] as const;
 
+// An image is displayable only if it is an uploaded photo (data URL) or a
+// hosted URL — the seeded "/products/*.jpg" paths have no files and 404.
+const hasDisplayableImage = (image?: string) =>
+  !!image && (image.startsWith("data:") || image.startsWith("http"));
+
 export default function Home() {
   const { t } = useI18n();
   const { data } = useLoader<ProductView[]>((signal) => loadProducts(signal), []);
   // Prefer live products (includes admin-uploaded images); fall back to the
   // bundled catalogue so the home page still renders offline / before load.
-  const featured = (data && data.length > 0 ? data : localProducts).slice(0, 3);
+  const source = data && data.length > 0 ? data : localProducts;
+  // Surface products that actually have a photo first so the featured row
+  // shows real images rather than "image pending" placeholders.
+  const featured = [...source]
+    .sort((a, b) => Number(hasDisplayableImage(b.image)) - Number(hasDisplayableImage(a.image)))
+    .slice(0, 3);
   return (
     <div className="space-y-10">
       <section className="rounded-2xl bg-brand-navy px-6 py-10 text-white sm:px-10">
