@@ -283,8 +283,16 @@ async function main() {
   // production PostgreSQL carries the same Academy catalog as the dev store.
   let coursesAdded = 0;
   for (const c of seedCourses) {
-    const existing = await prisma.course.findUnique({ where: { slug: c.slug } });
-    if (existing) continue;
+    const existing = await prisma.course.findUnique({ where: { slug: c.slug }, include: { modules: { include: { lessons: true } } } });
+    if (existing) {
+      // Refresh only when the seeded content has more modules/lessons than what
+      // is stored, so course expansions reach production without wiping data.
+      const storedLessons = existing.modules.reduce((n, m) => n + m.lessons.length, 0);
+      const seedLessons = c.modules.reduce((n, m) => n + m.lessons.length, 0);
+      const drifted = existing.modules.length !== c.modules.length || storedLessons !== seedLessons;
+      if (!drifted) continue;
+      await prisma.course.delete({ where: { id: existing.id } });
+    }
     await prisma.course.create({
       data: {
         slug: c.slug,

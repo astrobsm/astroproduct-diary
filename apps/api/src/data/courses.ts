@@ -446,9 +446,23 @@ export const seedCourses: Course[] = [
       {
         id: "mod-do-1",
         title: "Product Range & Handling",
+        summary: "Know what you sell and how to protect it from factory to wound.",
         lessons: [
           {
             id: "les-do-1-1",
+            title: "The ASTROBSM Wound-Care Range",
+            contentType: "TEXT",
+            durationMins: 8,
+            body:
+              "Bonnesante Medicals supplies a complementary wound-care range: Hera Wound Gel (advanced " +
+              "moist-healing gel), Wound-Clex Solution (cleansing and irrigation), Wound-Care Honey Gauze " +
+              "(honey-impregnated contact dressing) and the Sterile Dressing Pack (ready-to-use procedure " +
+              "kit). Learn each product's purpose, pack size and where it fits in the wound-care pathway — " +
+              "clean with Wound-Clex, treat with Hera Gel, dress with Honey Gauze, and complete with the " +
+              "Sterile Dressing Pack. Always direct clinical claims to the product pages and cited evidence."
+          },
+          {
+            id: "les-do-1-2",
             title: "Storage, Shelf-Life & Stock Rotation",
             contentType: "TEXT",
             durationMins: 9,
@@ -456,6 +470,53 @@ export const seedCourses: Course[] = [
               "Store products per the label: cool, dry and out of direct sunlight, with sterile packs kept " +
               "intact and dry. Rotate stock first-expiry-first-out (FEFO). Never dispatch product with a " +
               "compromised sterile barrier or past its expiry date."
+          },
+          {
+            id: "les-do-1-3",
+            title: "Transport & Cold-Chain Discipline",
+            contentType: "TEXT",
+            durationMins: 6,
+            body:
+              "Keep cartons sealed, upright and away from heat, fuel and direct sun during transport. Avoid " +
+              "stacking that crushes sterile packs. Inspect every delivery for water damage, swelling or torn " +
+              "seals and quarantine anything in doubt. Record batch numbers and expiry dates on receipt so a " +
+              "recall or query can be traced in minutes, not days."
+          }
+        ]
+      },
+      {
+        id: "mod-do-2",
+        title: "Order Flow & Fulfilment",
+        summary: "Move an order cleanly from request to delivered stock.",
+        lessons: [
+          {
+            id: "les-do-2-1",
+            title: "From Order to Delivery",
+            contentType: "TEXT",
+            durationMins: 7,
+            body:
+              "A standard order flows: customer request → stock check → confirm price and quantity → raise the " +
+              "order → pick FEFO → pack and label → dispatch → confirm receipt. Acknowledge every order in " +
+              "writing, keep the customer informed of timelines, and reconcile delivered quantities against the " +
+              "invoice. Resolve shortages or damages immediately and log them."
+          }
+        ]
+      },
+      {
+        id: "mod-do-3",
+        title: "Brand Standards & Compliance",
+        summary: "Represent ASTROBSM accurately, ethically and legally.",
+        lessons: [
+          {
+            id: "les-do-3-1",
+            title: "Representing the Brand",
+            contentType: "TEXT",
+            durationMins: 5,
+            body:
+              "Use only approved messaging and the evidence in the product and research pages — never invent " +
+              "claims. Stay within the price and territory you are authorised for, keep genuine product only, " +
+              "and route every clinical question to a qualified professional. The platform is an educational " +
+              "aid, not a substitute for professional clinical judgement."
           }
         ]
       }
@@ -480,6 +541,27 @@ export const seedCourses: Course[] = [
           options: ["True", "False"],
           correct: [1],
           explanation: "Never dispatch product with a compromised sterile barrier — sterility cannot be assumed."
+        },
+        {
+          id: "q-do-3",
+          prompt: "What is the correct wound-care sequence using the ASTROBSM range?",
+          type: "SINGLE",
+          options: [
+            "Dress, then clean, then treat",
+            "Clean with Wound-Clex, treat with Hera Gel, dress with Honey Gauze",
+            "Apply gel only",
+            "Use the Sterile Pack first, then irrigate"
+          ],
+          correct: [1],
+          explanation: "Clean with Wound-Clex, treat with Hera Wound Gel, then dress with Honey Gauze and the Sterile Dressing Pack."
+        },
+        {
+          id: "q-do-4",
+          prompt: "On receiving a delivery, what should a distributor record for traceability?",
+          type: "SINGLE",
+          options: ["Nothing", "Only the total price", "Batch numbers and expiry dates", "Driver's name only"],
+          correct: [2],
+          explanation: "Recording batch numbers and expiry dates makes recalls and queries traceable quickly."
         }
       ]
     },
